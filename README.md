@@ -1,8 +1,8 @@
 # 🌌 Gravity Loop
 
 **Developed by:**  
-- Wayan Raditya Putra  
-- Belva  
+- Wayan
+- Belva
 
 ## 🧩 Project Overview
 **Gravity Loop** is a 2D physics-based space game where the player controls a glowing energy orb influenced by planetary gravity.  
