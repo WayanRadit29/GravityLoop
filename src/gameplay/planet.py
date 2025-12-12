@@ -1,5 +1,5 @@
 import pygame
-from settings import *
+from GravityLoop.src.core.settings import *
 
 
 class Planet:
