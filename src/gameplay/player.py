@@ -14,6 +14,10 @@ class Player:
         self.ax = 0.0
         self.ay = 0.0
 
+        # Bagian visual
+        self.radius = 10
+        self.color = (200, 230, 255)
+
 
         
     def update(self):
@@ -41,9 +45,19 @@ class Player:
 
         self.ax += fx
         self.ay += fy
-        
+
 
     def render(self, surface: pygame.Surface):
-        pass
+        '''
+        Render player to screen 
+       
+        '''
+
+        pygame.draw.circle(
+            surface, 
+            self.color, 
+            (int(self.x), int(self.y)),
+            self.radius
+        )
 
 

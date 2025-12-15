@@ -4,6 +4,9 @@ from src.core.settings import(
     SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE, FPS, COLOR_BACKGROUND
 )
 
+from src.gameplay.player import Player
+
+
 class GameEngine:
     def __init__(self):
         self.screen = pygame.display.set_mode(
@@ -17,6 +20,12 @@ class GameEngine:
 
         # Game state 
         self.running = True
+
+        self.player = Player(
+                x=SCREEN_WIDTH // 2,
+                y=SCREEN_HEIGHT // 4
+                )
+
 
     def run(self):
         while self.running:
@@ -32,8 +41,12 @@ class GameEngine:
 
     def update(self):
         # Game logic will go here
-        pass
+        self.player.update()
+
 
     def render(self):
         self.screen.fill(COLOR_BACKGROUND)
+
+        self.player.render(self.screen)
+
         pygame.display.flip()
