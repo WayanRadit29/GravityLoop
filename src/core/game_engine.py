@@ -5,6 +5,8 @@ from src.core.settings import(
 )
 
 from src.gameplay.player import Player
+from src.gameplay.planet import Planet
+
 
 
 class GameEngine:
@@ -25,6 +27,12 @@ class GameEngine:
                 x=SCREEN_WIDTH // 2,
                 y=SCREEN_HEIGHT // 4
                 )
+        self.planet = Planet(
+                x=SCREEN_WIDTH // 2,
+                y=SCREEN_HEIGHT // 2,
+                radius=40
+            )
+
 
 
     def run(self):
@@ -40,13 +48,16 @@ class GameEngine:
                 self.running = False
 
     def update(self):
-        # Game logic will go here
+        self.planet.apply_gravity(self.player)
         self.player.update()
+
 
 
     def render(self):
         self.screen.fill(COLOR_BACKGROUND)
 
+        self.planet.render(self.screen)
         self.player.render(self.screen)
+
 
         pygame.display.flip()

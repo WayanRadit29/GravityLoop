@@ -1,22 +1,68 @@
 import pygame
-from GravityLoop.src.core.settings import *
+import math
 
+from src.core.settings import GRAVITY_CONSTANT
 
-class Planet:
-    def __init__(self, x, y, radius, gravity_range):
+class Planet: 
+    def __init__(self, x: float, y: float, radius: int):
+        # Posisi
         self.x = x
         self.y = y
+
+        # Physical size
         self.radius = radius
 
-        self.gravity_range = gravity_range
-        self.gravity_strength = 0.6     # bisa dituning nanti
+        # Gravity properties
+        self.gravity_radius = radius * 3
+        self.gravity_strength = GRAVITY_CONSTANT
 
+        # Visual
         self.color = (120, 150, 255)
-        self.range_color = (80, 80, 120)
+        self.gravity_color = (80, 80, 120)
 
-    def render(self, screen):
-        # render area gravitasi (sementara sebagai lingkaran transparan)
-        pygame.draw.circle(screen, self.range_color, (self.x, self.y), self.gravity_range, 1)
+    def apply_gravity(self, player):
+        # Vector from player to planet
+        dx = self.x - player.x
+        dy = self.y - player.y
 
-        # render planet
-        pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius)
+        distance = math.sqrt(dx * dx + dy * dy)
+
+        # Hindari pembagian nol
+        if distance == 0:
+            return
+        
+        # Cek apakah player masuk area gravitasu
+        if distance < self.gravity_radius:
+            # Normalized direction
+            nx = dx / distance
+            ny = dy / distance
+
+            # Strength falloff (semakin dekat, semakin kuat)
+
+            force = self.gravity_strength / distance
+
+            # Apply force to player
+            player.apply_force(
+                nx * force, 
+                ny * force
+            )
+
+    def render(self, surface: pygame.Surface):
+            # Draw gravity area (debug / visual cue)
+            pygame.draw.circle(
+                surface,
+                self.gravity_color,
+                (int(self.x), int(self.y)),
+                int(self.gravity_radius),
+                1
+            )
+
+            # Draw planet body
+            pygame.draw.circle(
+                surface,
+                self.color,
+                (int(self.x), int(self.y)),
+                self.radius
+            )
+
+
