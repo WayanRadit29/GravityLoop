@@ -22,6 +22,10 @@ class Player:
         self.orbit_radius = 0.0
         self.orbit_angle = 0.0
         self.orbit_speed = 0.03
+        
+        # State Release
+        self.release_cooldown = 0 
+
 
         # Visual
         self.radius = 10
@@ -43,20 +47,29 @@ class Player:
 
         self.vx = 0.0
         self.vy = 0.0
-
+    
     def release_orbit(self):
+        print("RELEASE CALLED")
+
         if not self.is_orbiting:
+            print("BUT NOT ORBITING")
             return
 
-        # Tangential velocity
-        speed = 5.0
-        self.vx = -math.sin(self.orbit_angle) * speed
-        self.vy = math.cos(self.orbit_angle) * speed
+        release_speed = 6.0
+        self.vx = -math.sin(self.orbit_angle) * release_speed
+        self.vy =  math.cos(self.orbit_angle) * release_speed
 
         self.is_orbiting = False
         self.orbit_center = None
+        self.release_cooldown = 20
+
+        print("RELEASE SUCCESS")
+
 
     def update(self):
+        if self.release_cooldown > 0:
+            self.release_cooldown -= 1
+
         if self.is_orbiting:
             self.orbit_angle += self.orbit_speed
             self.x = self.orbit_center.x + math.cos(self.orbit_angle) * self.orbit_radius
@@ -72,6 +85,7 @@ class Player:
 
         self.ax = 0.0
         self.ay = 0.0
+
 
     def render(self, surface: pygame.Surface):
         pygame.draw.circle(
