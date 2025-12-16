@@ -9,7 +9,7 @@ class Planet:
         self.y = y
         self.radius = radius
 
-        self.gravity_radius = radius * 5
+        self.gravity_radius = radius * 4.9
         self.gravity_strength = GRAVITY_CONSTANT * 3
 
         self.color = (120, 150, 255)
@@ -24,9 +24,14 @@ class Planet:
             return
 
         # Masuk orbit otomatis
-        if dist < self.radius + 5 and not player.is_orbiting:
-            player.start_orbit(self)
-            return
+        if (
+            dist < self.radius + 5
+            and not player.is_orbiting
+            and player.release_cooldown == 0 
+            ):
+                player.start_orbit(self)
+                return
+
 
         if dist < self.gravity_radius and not player.is_orbiting:
             nx = dx / dist

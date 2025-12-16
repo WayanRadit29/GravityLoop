@@ -56,6 +56,13 @@ class GameEngine:
             if event.type == pygame.QUIT:
                 self.running = False
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    print("SPACE PRESSED")
+                    self.player.release_orbit()
+
+
+
     def update(self):
         self.planet.apply_gravity(self.player)
         self.player.update()
