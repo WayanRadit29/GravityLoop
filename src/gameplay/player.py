@@ -79,6 +79,13 @@ class Player:
         self.is_orbiting = False
         self.orbit_center = None
         self.release_cooldown = 20
+    
+    def crash(self):
+        self.visual_state = "CRASH"
+        self.vx = 0
+        self.vy = 0
+        self.ax = 0
+        self.ay = 0
 
 
     def update_visual_state(self):

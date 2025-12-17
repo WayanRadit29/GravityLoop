@@ -9,6 +9,7 @@ from src.gameplay.planet import Planet
 from src.gameplay.rocket import Rocket
 from src.obstacle.meteor import Meteor
 from src.obstacle.meteor_spawner import MeteorSpawner
+from src.gameplay.collision import check_player_meteor_collision
 
 
 
@@ -51,7 +52,7 @@ class GameEngine:
         self.meteor_spawner = MeteorSpawner(SCREEN_WIDTH)
 
 
-
+        self.game_over = False
         self.win = False
 
 
@@ -75,10 +76,24 @@ class GameEngine:
 
 
     def update(self):
+        if self.game_over:
+            return
+
         self.planet.apply_gravity(self.player)
         self.player.update()
         current_time = pygame.time.get_ticks()
         self.meteor_spawner.update(current_time, SCREEN_HEIGHT)
+
+        hit_meteor = check_player_meteor_collision(
+            self.player,
+            self.meteor_spawner.meteors
+        )
+
+        if hit_meteor and not self.game_over:
+            self.player.crash()
+            hit_meteor.explode()
+            self.game_over = True
+
 
 
         if self.rocket.check_dock(self.player):
