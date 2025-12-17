@@ -13,6 +13,7 @@ from src.gameplay.collision import check_player_meteor_collision
 from src.obstacle.blackhole import BlackHole
 from src.core.audio_manager import AudioManager
 from src.core.level_manager import LevelManager
+from src.ui.lobby import Lobby
 
 
 class GameEngine:
@@ -21,6 +22,9 @@ class GameEngine:
             (SCREEN_WIDTH, SCREEN_HEIGHT)
         )
         pygame.display.set_caption(WINDOW_TITLE)
+
+        self.state = "LOBBY"
+        self.lobby = Lobby(self.screen)
 
         self.clock = pygame.time.Clock()
         self.running = True
@@ -34,6 +38,8 @@ class GameEngine:
             x=SCREEN_WIDTH // 2,
             y=SCREEN_HEIGHT // 4
         )
+
+
 
         # World objects (default None, diisi oleh level)
         self.planet = None
@@ -96,6 +102,11 @@ class GameEngine:
                         self.load_level(self.current_level)
                     else:
                         self.running = False
+            if self.state == "LOBBY":
+                action = self.lobby.handle_event(event)
+                if action == "START":
+                    self.state = "LEVEL_SELECT"
+
 
     # ================= UPDATE =================
 
@@ -176,6 +187,11 @@ class GameEngine:
     def render(self):
         self.screen.fill(COLOR_BACKGROUND)
 
+        if self.state == "LOBBY":
+            self.lobby.draw()
+            pygame.display.flip()
+            return
+
         # World (back layer)
         if self.blackhole is not None:
             self.blackhole.render(self.screen)
@@ -196,6 +212,7 @@ class GameEngine:
 
         if self.rocket is not None:
             self.rocket.render(self.screen)
+
 
         # UI
         font = pygame.font.SysFont(None, 24)
