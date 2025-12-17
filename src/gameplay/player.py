@@ -58,6 +58,38 @@ class Player:
             )
         }
 
+    def reset(self, x: float, y: float):
+        # Position
+        self.x = x
+        self.y = y
+
+        # Velocity
+        self.vx = 1.5
+        self.vy = 0.0
+
+        # Acceleration
+        self.ax = 0.0
+        self.ay = 0.0
+
+        # Orbit state
+        self.is_orbiting = False
+        self.orbit_center = None
+        self.orbit_radius = 0.0
+        self.orbit_angle = 0.0
+
+        # Black hole state
+        self.in_blackhole = False
+        self.bh_center = None
+        self.bh_angle = 0.0
+        self.bh_distance = 0.0
+
+        # Visual & life state
+        self.visual_state = "IDLE"
+        self.alive = True
+
+        # Cooldowns
+        self.release_cooldown = 0
+
 
     def apply_force(self, fx: float, fy: float):
         self.ax += fx
