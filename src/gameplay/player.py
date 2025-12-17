@@ -1,6 +1,9 @@
 import pygame
 import math
 
+from src.visual.sprite_loader import load_sprite
+
+
 
 class Player:
     def __init__(self, x: float, y: float):
@@ -30,6 +33,10 @@ class Player:
         # Visual
         self.radius = 10
         self.color = (200, 230, 255)
+        self.sprite = load_sprite(
+            "src/assets/images/astronot/idle.png",
+        scale=(32, 32)
+        )
 
     def apply_force(self, fx: float, fy: float):
         self.ax += fx
@@ -49,10 +56,8 @@ class Player:
         self.vy = 0.0
     
     def release_orbit(self):
-        print("RELEASE CALLED")
 
         if not self.is_orbiting:
-            print("BUT NOT ORBITING")
             return
 
         release_speed = 6.0
@@ -63,7 +68,7 @@ class Player:
         self.orbit_center = None
         self.release_cooldown = 20
 
-        print("RELEASE SUCCESS")
+
 
 
     def update(self):
@@ -88,9 +93,13 @@ class Player:
 
 
     def render(self, surface: pygame.Surface):
-        pygame.draw.circle(
-            surface,
-            self.color,
-            (int(self.x), int(self.y)),
-            self.radius
-        )
+        if self.sprite:
+            rect = self.sprite.get_rect(center=(int(self.x), int(self.y)))
+            surface.blit(self.sprite, rect)
+        else:
+            pygame.draw.circle(
+                surface,
+                self.color,
+                (int(self.x), int(self.y)),
+                self.radius
+            )
