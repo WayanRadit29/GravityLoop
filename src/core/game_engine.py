@@ -7,6 +7,9 @@ from src.core.settings import(
 from src.gameplay.player import Player
 from src.gameplay.planet import Planet
 from src.gameplay.rocket import Rocket
+from src.obstacle.meteor import Meteor
+from src.obstacle.meteor_spawner import MeteorSpawner
+
 
 
 
@@ -40,6 +43,15 @@ class GameEngine:
             SCREEN_HEIGHT // 2
         )
 
+        self.static_meteors = [
+            Meteor(300, 250),
+            Meteor(500, 350),
+        ]
+
+        self.meteor_spawner = MeteorSpawner(SCREEN_WIDTH)
+
+
+
         self.win = False
 
 
@@ -58,7 +70,6 @@ class GameEngine:
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    print("SPACE PRESSED")
                     self.player.release_orbit()
 
 
@@ -66,6 +77,9 @@ class GameEngine:
     def update(self):
         self.planet.apply_gravity(self.player)
         self.player.update()
+        current_time = pygame.time.get_ticks()
+        self.meteor_spawner.update(current_time, SCREEN_HEIGHT)
+
 
         if self.rocket.check_dock(self.player):
             self.win = True
@@ -79,6 +93,11 @@ class GameEngine:
         self.planet.render(self.screen)
         self.player.render(self.screen)
         self.rocket.render(self.screen)
+        self.meteor_spawner.render(self.screen)
+
+        for meteor in self.static_meteors:
+            meteor.render(self.screen)
+
 
         if self.win:
             font = pygame.font.SysFont(None, 42)
