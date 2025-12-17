@@ -26,27 +26,28 @@ class LevelManager:
 
     def _easy_level(self):
         return {
-            "planet": Planet(self.screen_width // 2, self.screen_height // 2, 50),
-
-            "blackhole": None,
-
-            "static_meteors": [
-                Meteor(300, 250),
+            # ===== PLANETS =====
+            # Planet 1 — Starter (auto-capture, safety net)
+            "planets": [
+                Planet(250, 300, 55),   # Planet 1
+                Planet(400, 200, 50),   # Planet 2
+                Planet(550, 350, 48),   # Planet 3
             ],
 
-            "meteor_spawner": MeteorSpawner(
-                self.screen_width,
-                spawn_interval=4000,
-                speed_y=3
-            ),
+            # ===== NO DANGERS =====
+            "blackhole": None,
+            "static_meteors": [],
+            "meteor_spawner": None,
 
+            # ===== GOAL =====
             "rocket": Rocket(
-                self.screen_width - 120,
-                self.screen_height // 2
+                self.screen_width - 80,  # ~720
+                self.screen_height // 2  # 300
             ),
 
             "name": "EASY"
         }
+
 
     def _medium_level(self):
         return {

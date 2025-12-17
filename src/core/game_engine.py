@@ -14,6 +14,8 @@ from src.obstacle.blackhole import BlackHole
 from src.core.audio_manager import AudioManager
 from src.core.level_manager import LevelManager
 from src.ui.lobby import Lobby
+from src.ui.picklevel import PickLevel
+
 
 
 class GameEngine:
@@ -23,51 +25,54 @@ class GameEngine:
         )
         pygame.display.set_caption(WINDOW_TITLE)
 
+        # ===== STATE =====
         self.state = "LOBBY"
+
+        # ===== UI =====
         self.lobby = Lobby(self.screen)
+        self.pick_level = PickLevel(self.screen)
 
         self.clock = pygame.time.Clock()
         self.running = True
 
-        # Core systems
+        # ===== CORE SYSTEMS =====
         self.audio = AudioManager()
         self.level_manager = LevelManager(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-        # Player (akan di-reset tiap level)
+        # ===== PLAYER =====
         self.player = Player(
             x=SCREEN_WIDTH // 2,
             y=SCREEN_HEIGHT // 4
         )
 
-
-
-        # World objects (default None, diisi oleh level)
+        # ===== WORLD OBJECTS =====
         self.planet = None
         self.blackhole = None
         self.rocket = None
         self.meteor_spawner = None
-        self.static_meteors = None
+        self.static_meteors = []
 
-        # Game state
+        # ===== GAME FLAGS =====
         self.game_over = False
         self.win = False
 
-        # Level state
         self.current_level = 1
-        self.load_level(self.current_level)
 
     # ================= LEVEL LOADING =================
 
     def load_level(self, level_id):
         level_data = self.level_manager.load_level(level_id)
 
-        self.planet = level_data.get("planet")
+        self.planets = level_data.get("planets", [])
         self.blackhole = level_data.get("blackhole")
         self.rocket = level_data.get("rocket")
         self.meteor_spawner = level_data.get("meteor_spawner")
         self.static_meteors = level_data.get("static_meteors", [])
 
-        # Reset player state
+        if self.meteor_spawner is not None:
+            self.meteor_spawner.meteors.clear()
+            self.meteor_spawner.last_spawn_time = 0
+
         self.player.reset(
             x=SCREEN_WIDTH // 2,
             y=SCREEN_HEIGHT // 4
@@ -92,80 +97,84 @@ class GameEngine:
             if event.type == pygame.QUIT:
                 self.running = False
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    self.player.release_orbit()
-
-                if self.win and event.key == pygame.K_RETURN:
-                    self.current_level += 1
-                    if self.current_level <= 3:
-                        self.load_level(self.current_level)
-                    else:
-                        self.running = False
+            # ---------- LOBBY ----------
             if self.state == "LOBBY":
                 action = self.lobby.handle_event(event)
                 if action == "START":
                     self.state = "LEVEL_SELECT"
 
+            # ---------- PICK LEVEL ----------
+            elif self.state == "LEVEL_SELECT":
+                action = self.pick_level.handle_event(event)
+
+                if action == "LEVEL_1":
+                    self.start_game(1)
+                elif action == "LEVEL_2":
+                    self.start_game(2)
+                elif action == "LEVEL_3":
+                    self.start_game(3)
+                elif action == "GO_LOBBY":
+                    self.state = "LOBBY"
+
+            # ---------- PLAYING ----------
+            elif self.state == "PLAYING":
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.player.release_orbit()
+
+                    if self.win and event.key == pygame.K_RETURN:
+                        self.next_level()
 
     # ================= UPDATE =================
 
     def update(self):
+        if self.state != "PLAYING":
+            return
+
         if self.game_over or self.win:
             return
 
-        # ---------- Black Hole Logic (OPTIONAL) ----------
-        if (
-            self.blackhole is not None
-            and not self.player.in_blackhole
-        ):
+        if self.blackhole and not self.player.in_blackhole:
             if self.blackhole.check_player_inside(self.player):
                 self.blackhole.start_suck(self.player)
 
-        if self.blackhole is not None:
-            if self.player.in_blackhole and not self.player.alive:
-                self.game_over = True
-                self.audio.play_lose()
-                return
+        if self.blackhole and self.player.in_blackhole and not self.player.alive:
+            self.game_over = True
+            self.audio.play_lose()
+            return
 
-        # ---------- Planet Gravity ----------
-        if self.planet is not None:
-            self.planet.apply_gravity(self.player)
+        for planet in self.planets:
+            planet.apply_gravity(self.player)
 
-        # ---------- Player ----------
         self.player.update()
 
-        # ---------- Meteor Spawner (OPTIONAL) ----------
-        if self.meteor_spawner is not None:
+        if self.meteor_spawner:
             current_time = pygame.time.get_ticks()
             self.meteor_spawner.update(current_time, SCREEN_HEIGHT)
 
-            hit_meteor = check_player_meteor_collision(
+            hit = check_player_meteor_collision(
                 self.player,
                 self.meteor_spawner.meteors
             )
-
-            if hit_meteor:
+            if hit:
                 self.player.crash()
-                hit_meteor.explode()
+                hit.explode()
                 self.game_over = True
                 self.audio.play_lose()
                 return
 
-        # ---------- Static Meteors (OPTIONAL) ----------
         if self.static_meteors:
-            hit_static = check_player_meteor_collision(
+            hit = check_player_meteor_collision(
                 self.player,
                 self.static_meteors
             )
-            if hit_static:
+            if hit:
                 self.player.crash()
-                hit_static.explode()
+                hit.explode()
                 self.game_over = True
                 self.audio.play_lose()
                 return
 
-        # ---------- Out of Screen ----------
         if (
             self.player.x < -50 or
             self.player.x > SCREEN_WIDTH + 50 or
@@ -176,11 +185,9 @@ class GameEngine:
             self.audio.play_lose()
             return
 
-        # ---------- Win ----------
-        if self.rocket is not None:
-            if self.rocket.check_dock(self.player):
-                self.win = True
-                self.audio.play_win()
+        if self.rocket and self.rocket.check_dock(self.player):
+            self.win = True
+            self.audio.play_win()
 
     # ================= RENDER =================
 
@@ -192,47 +199,41 @@ class GameEngine:
             pygame.display.flip()
             return
 
-        # World (back layer)
-        if self.blackhole is not None:
+        if self.state == "LEVEL_SELECT":
+            self.pick_level.draw()
+            pygame.display.flip()
+            return
+
+        # ===== PLAYING =====
+        if self.blackhole:
             self.blackhole.render(self.screen)
 
-        if self.planet is not None:
-            self.planet.render(self.screen)
+        for planet in self.planets:
+            planet.render(self.screen)
 
-        # Obstacles
-        if self.meteor_spawner is not None:
+        if self.meteor_spawner:
             self.meteor_spawner.render(self.screen)
 
-        if self.static_meteors:
-            for meteor in self.static_meteors:
-                meteor.render(self.screen)
+        for meteor in self.static_meteors:
+            meteor.render(self.screen)
 
-        # Player & goal
         self.player.render(self.screen)
 
-        if self.rocket is not None:
+        if self.rocket:
             self.rocket.render(self.screen)
 
-
-        # UI
-        font = pygame.font.SysFont(None, 24)
-        level_text = font.render(
-            f"LEVEL {self.current_level}",
-            True,
-            (255, 255, 255)
-        )
-        self.screen.blit(level_text, (10, 10))
-
-        if self.win:
-            font_big = pygame.font.SysFont(None, 42)
-            text = font_big.render(
-                "ASTRONAUT RESCUED!",
-                True,
-                (255, 255, 255)
-            )
-            self.screen.blit(
-                text,
-                (SCREEN_WIDTH // 2 - 160, 40)
-            )
-
         pygame.display.flip()
+
+    # ================= API =================
+
+    def start_game(self, level_id):
+        self.current_level = level_id
+        self.load_level(level_id)
+        self.state = "PLAYING"
+
+    def next_level(self):
+        self.current_level += 1
+        if self.current_level <= 3:
+            self.load_level(self.current_level)
+        else:
+            self.state = "LOBBY"

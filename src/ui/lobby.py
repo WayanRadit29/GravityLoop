@@ -51,5 +51,6 @@ class Lobby:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.btn_start_rect.collidepoint(event.pos):
                 print("Tombol Start Diklik! Berpindah ke Game Engine...")
-                return "START" # Beri sinyal ke state_manager
+                return "START"
+                
         return None
