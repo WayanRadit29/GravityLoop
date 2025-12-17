@@ -33,10 +33,22 @@ class Player:
         # Visual
         self.radius = 10
         self.color = (200, 230, 255)
-        self.sprite = load_sprite(
-            "src/assets/images/astronot/idle.png",
-        scale=(32, 32)
-        )
+        self.visual_state = "IDLE"
+        self.sprites = {
+            "IDLE": load_sprite(
+                "src/assets/images/astronot/idle.png",
+                scale=(64, 64)
+            ),
+            "SWING": load_sprite(
+                "src/assets/images/astronot/swinging.png",
+                scale=(64, 64)
+            ),
+            "CRASH": load_sprite(
+                "src/assets/images/astronot/crash.png",
+                scale=(64, 64)
+            )
+        }
+
 
     def apply_force(self, fx: float, fy: float):
         self.ax += fx
@@ -69,7 +81,14 @@ class Player:
         self.release_cooldown = 20
 
 
+    def update_visual_state(self):
+        if self.visual_state == "CRASH":
+            return  # crash state tidak berubah sendiri
 
+        if self.is_orbiting:
+            self.visual_state = "SWING"
+        else:
+            self.visual_state = "IDLE"
 
     def update(self):
         if self.release_cooldown > 0:
@@ -79,6 +98,8 @@ class Player:
             self.orbit_angle += self.orbit_speed
             self.x = self.orbit_center.x + math.cos(self.orbit_angle) * self.orbit_radius
             self.y = self.orbit_center.y + math.sin(self.orbit_angle) * self.orbit_radius
+
+            self.update_visual_state()
             return
 
         # Physics update
@@ -91,11 +112,16 @@ class Player:
         self.ax = 0.0
         self.ay = 0.0
 
+        self.update_visual_state()
+
+    
 
     def render(self, surface: pygame.Surface):
-        if self.sprite:
-            rect = self.sprite.get_rect(center=(int(self.x), int(self.y)))
-            surface.blit(self.sprite, rect)
+        sprite = self.sprites.get(self.visual_state)
+
+        if sprite:
+            rect = sprite.get_rect(center=(int(self.x), int(self.y)))
+            surface.blit(sprite, rect)
         else:
             pygame.draw.circle(
                 surface,
@@ -103,3 +129,4 @@ class Player:
                 (int(self.x), int(self.y)),
                 self.radius
             )
+

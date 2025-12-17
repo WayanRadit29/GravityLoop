@@ -13,7 +13,7 @@ class Rocket:
         self.color = (220, 220, 220)
         self.sprite = load_sprite(
             "src/assets/images/rocket/rocket.png",
-            scale=(40, 72)
+            scale=(70, 80)
         )
 
 
