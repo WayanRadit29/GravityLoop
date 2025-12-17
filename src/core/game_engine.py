@@ -11,6 +11,8 @@ from src.obstacle.meteor import Meteor
 from src.obstacle.meteor_spawner import MeteorSpawner
 from src.gameplay.collision import check_player_meteor_collision
 from src.obstacle.blackhole import BlackHole
+from src.core.audio_manager import AudioManager
+
 
 
 
@@ -54,6 +56,8 @@ class GameEngine:
 
         self.blackhole = BlackHole(500, 300, 120)
 
+        self.audio = AudioManager()
+
 
         self.game_over = False
         self.win = False
@@ -88,6 +92,7 @@ class GameEngine:
         
         if self.player.in_blackhole and not self.player.alive:
             self.game_over = True
+            self.audio.play_lose()
 
 
         self.planet.apply_gravity(self.player)
@@ -104,10 +109,22 @@ class GameEngine:
             self.player.crash()
             hit_meteor.explode()
             self.game_over = True
+            self.audio.play_lose()
+
+        if (
+            self.player.x < -50 or
+            self.player.x > SCREEN_WIDTH + 50 or
+            self.player.y < -50 or
+            self.player.y > SCREEN_HEIGHT + 50
+        ):
+            self.game_over = True
+            self.audio.play_lose()
+
 
 
         if self.rocket.check_dock(self.player):
             self.win = True
+            self.audio.play_win()
 
 
 
