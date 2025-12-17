@@ -7,6 +7,8 @@ from src.visual.sprite_loader import load_sprite
 
 class Player:
     def __init__(self, x: float, y: float):
+        self.alive = True
+
         # Position
         self.x = x
         self.y = y
@@ -28,6 +30,13 @@ class Player:
         
         # State Release
         self.release_cooldown = 0 
+
+        # Black Hole state
+        self.in_blackhole = False
+        self.bh_center = None
+        self.bh_angle = 0.0
+        self.bh_distance = 0.0
+
 
 
         # Visual
@@ -66,6 +75,23 @@ class Player:
 
         self.vx = 0.0
         self.vy = 0.0
+
+    def start_blackhole_suck(self, blackhole):
+        self.in_blackhole = True
+        self.is_orbiting = False
+
+        dx = self.x - blackhole.x
+        dy = self.y - blackhole.y
+
+        self.bh_center = blackhole
+        self.bh_distance = math.sqrt(dx * dx + dy * dy)
+        self.bh_angle = math.atan2(dy, dx)
+
+        self.vx = 0
+        self.vy = 0
+        self.ax = 0
+        self.ay = 0
+
     
     def release_orbit(self):
 
@@ -92,12 +118,33 @@ class Player:
         if self.visual_state == "CRASH":
             return  # crash state tidak berubah sendiri
 
+        if self.in_blackhole:
+            return #Biarkan black hole yang atur
+                
         if self.is_orbiting:
             self.visual_state = "SWING"
+
         else:
             self.visual_state = "IDLE"
 
     def update(self):
+        if self.in_blackhole:
+            self.bh_angle += 0.15        # kecepatan muter
+            self.bh_distance -= 0.8      # kecepatan mendekat
+
+            self.x = self.bh_center.x + math.cos(self.bh_angle) * self.bh_distance
+            self.y = self.bh_center.y + math.sin(self.bh_angle) * self.bh_distance
+
+
+            # Trigger crash sprite dekat pusat black hole
+            if self.bh_distance < 25:
+                self.visual_state = "CRASH"
+
+            # Mati total
+            if self.bh_distance < 5:
+                self.alive = False  
+            return
+
         if self.release_cooldown > 0:
             self.release_cooldown -= 1
 

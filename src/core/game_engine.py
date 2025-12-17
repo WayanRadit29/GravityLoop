@@ -10,6 +10,7 @@ from src.gameplay.rocket import Rocket
 from src.obstacle.meteor import Meteor
 from src.obstacle.meteor_spawner import MeteorSpawner
 from src.gameplay.collision import check_player_meteor_collision
+from src.obstacle.blackhole import BlackHole
 
 
 
@@ -51,6 +52,8 @@ class GameEngine:
 
         self.meteor_spawner = MeteorSpawner(SCREEN_WIDTH)
 
+        self.blackhole = BlackHole(500, 300, 120)
+
 
         self.game_over = False
         self.win = False
@@ -76,8 +79,16 @@ class GameEngine:
 
 
     def update(self):
-        if self.game_over:
+        if self.game_over or self.win:
             return
+        
+        if not self.game_over and not self.player.in_blackhole:
+            if self.blackhole.check_player_inside(self.player):
+                self.blackhole.start_suck(self.player)
+        
+        if self.player.in_blackhole and not self.player.alive:
+            self.game_over = True
+
 
         self.planet.apply_gravity(self.player)
         self.player.update()
@@ -95,7 +106,6 @@ class GameEngine:
             self.game_over = True
 
 
-
         if self.rocket.check_dock(self.player):
             self.win = True
 
@@ -105,21 +115,23 @@ class GameEngine:
     def render(self):
         self.screen.fill(COLOR_BACKGROUND)
 
+        # World layer (paling belakang)
+        self.blackhole.render(self.screen)
         self.planet.render(self.screen)
-        self.player.render(self.screen)
-        self.rocket.render(self.screen)
-        self.meteor_spawner.render(self.screen)
 
+        # Obstacles
+        self.meteor_spawner.render(self.screen)
         for meteor in self.static_meteors:
             meteor.render(self.screen)
 
+        # Player & goal
+        self.player.render(self.screen)
+        self.rocket.render(self.screen)
 
+        # UI
         if self.win:
             font = pygame.font.SysFont(None, 42)
             text = font.render("ASTRONAUT RESCUED!", True, (255, 255, 255))
             self.screen.blit(text, (SCREEN_WIDTH // 2 - 160, 40))
-
-
-
 
         pygame.display.flip()
