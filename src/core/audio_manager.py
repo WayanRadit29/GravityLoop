@@ -6,17 +6,13 @@ class AudioManager:
         pygame.mixer.init()
 
         # Lose sounds
-        self.lose = pygame.mixer.Sound(
-            "src/assets/sounds/sound_effect/sfxlose/lose.wav"
-        )
-
+        self.lose = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxlose/lose.wav")
         # Win sounds
-        self.finallyrocket = pygame.mixer.Sound(
-            "src/assets/sounds/sound_effect/sfxwin/finallyrocket.wav"
-        )
-        self.win = pygame.mixer.Sound(
-            "src/assets/sounds/sound_effect/sfxwin/win.wav"
-        )
+        self.finallyrocket = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxwin/finallyrocket.wav")
+        self.win = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxwin/win.wav")
+
+        # Jump sound
+        self.jump = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxgame/hopjump.wav")
 
         self.has_played_lose = False
         self.has_played_win = False
@@ -32,7 +28,8 @@ class AudioManager:
             self.win.play()
             self.has_played_win = True
 
-    # --- TAMBAHAN CODE UNTUK CONNECT KE GAME ENGINE ---
+    def play_jump(self):
+        self.jump.play()
 
     def play_lobby_music(self):
         """Memutar musik di menu lobby (mp3)"""

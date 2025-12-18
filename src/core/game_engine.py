@@ -128,6 +128,8 @@ class GameEngine:
             elif self.state == "PLAYING":
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
+                        # --- TAMBAHAN: SFX saat lompat/lepas orbit ---
+                        self.audio.play_jump() 
                         self.player.release_orbit()
 
                     if self.win and event.key == pygame.K_RETURN:
