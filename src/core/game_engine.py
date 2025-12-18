@@ -15,6 +15,7 @@ from src.core.audio_manager import AudioManager
 from src.core.level_manager import LevelManager
 from src.ui.lobby import Lobby
 from src.ui.picklevel import PickLevel
+from src.ui.game_over import GameOverOverlay
 
 
 
@@ -31,6 +32,7 @@ class GameEngine:
         # ===== UI =====
         self.lobby = Lobby(self.screen)
         self.pick_level = PickLevel(self.screen)
+        self.game_over_ui = GameOverOverlay(self.screen)
 
         self.clock = pygame.time.Clock()
         self.running = True
@@ -57,6 +59,7 @@ class GameEngine:
         self.win = False
 
         self.current_level = 1
+        
 
     # ================= LEVEL LOADING =================
 
@@ -124,6 +127,28 @@ class GameEngine:
 
                     if self.win and event.key == pygame.K_RETURN:
                         self.next_level()
+            
+                if self.game_over or self.win:
+                    action = self.game_over_ui.handle_event(event)
+                    if action == "PICK_LEVEL":
+                        self.state = "LEVEL_SELECT"
+                    elif action == "RESTART":
+                        self.load_level(self.current_level)
+                    elif action == "NEXT" and self.win:
+                        self.next_level()
+                        
+            # ---------- GAME OVER ----------
+            elif self.state == "GAME_OVER":
+                action = self.game_over_ui.handle_event(event)
+                if action == "PICK_LEVEL":
+                    self.state = "LEVEL_SELECT"
+                elif action == "RESTART":
+                    self.load_level(self.current_level)
+                    
+                elif action == "NEXT" and self.win:
+                    self.next_level()
+                        
+            
 
     # ================= UPDATE =================
 
@@ -221,6 +246,11 @@ class GameEngine:
 
         if self.rocket:
             self.rocket.render(self.screen)
+            
+        if self.game_over:
+            self.game_over_ui.draw("MISSION FAILED", (255, 0, 0))
+        elif self.win:
+            self.game_over_ui.draw("ASTRONOUT RESCUED!", (0, 255, 0))
 
         pygame.display.flip()
 
