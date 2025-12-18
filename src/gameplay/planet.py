@@ -12,7 +12,7 @@ class Planet:
 
         # ===== GRAVITY TUNING =====
         # Lebih kecil agar tidak overlap antar planet (khusus easy)
-        self.gravity_radius = radius * 2.8
+        self.gravity_radius = radius * 2
         self.gravity_strength = GRAVITY_CONSTANT * 2.2
 
         # ===== VISUAL =====

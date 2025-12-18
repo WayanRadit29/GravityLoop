@@ -1,20 +1,38 @@
-import random
 from src.obstacle.meteor import Meteor
 
 
 class MeteorSpawner:
-    def __init__(self, screen_width, spawn_interval=3000, speed_y=4):
+    def __init__(self, mode="RANDOM", screen_width=None):
+        self.mode = mode
         self.screen_width = screen_width
+
+        self.meteors = []
+
+        self.emitters = []
+        self.last_spawn_times = []
+
+        self.spawn_interval = 3000
+        self.speed_y = 4
+        self.last_spawn_time = 0
+
+    # ================= CONFIG =================
+
+    def set_random_config(self, spawn_interval=3000, speed_y=4):
         self.spawn_interval = spawn_interval
         self.speed_y = speed_y
 
-        self.last_spawn_time = 0
-        self.meteors = []
+    def set_emitters(self, emitters):
+        self.emitters = emitters
+        self.last_spawn_times = [0 for _ in emitters]
+
+    # ================= UPDATE =================
 
     def update(self, current_time, screen_height):
-        if current_time - self.last_spawn_time >= self.spawn_interval:
-            self.spawn_meteor()
-            self.last_spawn_time = current_time
+        if self.mode == "RANDOM":
+            self._update_random(current_time)
+
+        elif self.mode == "FROM_STATIC":
+            self._update_from_static(current_time)
 
         for meteor in self.meteors:
             meteor.update()
@@ -24,17 +42,44 @@ class MeteorSpawner:
             if not m.is_off_screen(screen_height)
         ]
 
-    def spawn_meteor(self):
-        x = random.randint(40, self.screen_width - 40)
+    # ================= SPAWN MODES =================
+
+    def _update_random(self, current_time):
+        if current_time - self.last_spawn_time >= self.spawn_interval:
+            self.spawn_random()
+            self.last_spawn_time = current_time
+
+    def _update_from_static(self, current_time):
+        for i, emitter in enumerate(self.emitters):
+            interval = emitter["interval"]
+            last_time = self.last_spawn_times[i]
+
+            if current_time - last_time >= interval:
+                self.spawn_from_emitter(emitter)
+                self.last_spawn_times[i] = current_time
+
+    # ================= SPAWN METHODS =================
+
+    def spawn_random(self):
+        x = self.screen_width // 2
         y = -50
-
-        speed = random.randint(
-            self.speed_y - 1,
-            self.speed_y + 1
-        )
-
-        meteor = Meteor(x, y, speed_y=speed)
+        meteor = Meteor(x, y, speed_y=self.speed_y)
         self.meteors.append(meteor)
+
+    def spawn_from_emitter(self, emitter):
+        x, y = emitter["pos"]
+        vx, vy = emitter["direction"]
+        speed = emitter["speed"]
+
+        meteor = Meteor(
+            x,
+            y,
+            vx=vx * speed,
+            vy=vy * speed
+        )
+        self.meteors.append(meteor)
+
+    # ================= RENDER =================
 
     def render(self, surface):
         for meteor in self.meteors:
