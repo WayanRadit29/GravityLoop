@@ -1,120 +1,190 @@
+
 # 🌌 Gravity Loop
 
-**Developed by:**  
-- Wayan
-- Belva
+**Gravity Loop** adalah game 2D berbasis fisika gravitasi yang dikembangkan menggunakan **Python** dan **Pygame**, dengan fokus pada penerapan **Object-Oriented Programming (OOP)**, **state-based game architecture**, dan **desain gameplay berbasis constraint**.
 
-## 🧩 Project Overview
-**Gravity Loop** is a 2D physics-based space game where the player controls a glowing energy orb influenced by planetary gravity.  
-Players must enter planetary orbits, time their release precisely, and travel from one planet to another while avoiding obstacles such as meteors, black holes, and AI-driven Meteor Drones.
-
-This project is built using **Python** and **Pygame**, applying **Object-Oriented Programming (OOP)** principles to ensure clean, modular, and scalable game architecture.
+Game ini dikembangkan sebagai **proyek akademik** sekaligus **prototype publik**, sehingga dokumentasi ini menggabungkan sudut pandang teknis, edukatif, dan showcase.
 
 ---
 
-## 🚀 Features (Planned)
-- Gravitational swing mechanics between planets  
-- Physics-based movement and orbit simulation  
-- Static obstacles (meteors) and dynamic obstacles (Meteor Drones)  
-- Black hole gravity hazard  
-- Adaptive AI difficulty system  
-- Portal objective to complete levels  
-- Minimalistic space-themed visuals  
-- Simple one-button control scheme  
-- Optional sound effects and background music  
-
----
-
-## 🧠 Learning Objectives
-- Implement OOP concepts (Encapsulation, Inheritance, Polymorphism, Abstraction) in game development  
-- Build a physics-influenced movement system using Pygame  
-- Implement basic AI for dynamic obstacles  
-- Practice team collaboration through Git and GitHub  
-- Develop a complete game prototype from concept to presentation  
-
----
-
-## 🛠️ Tech Stack
-- **Language:** Python 3  
-- **Library:** Pygame  
-- **Tools:** Git, GitHub, VS Code  
-
----
-
-## 📅 Development Timeline
-| Week | Focus | Description |
-|------|--------|-------------|
-| 11 | Idea & Proposal | Game concept, mechanics, and class design |
-| 12–13 | Core Mechanics | Gravity system, orbit physics, player control |
-| 14 | AI & Obstacles | Meteor Drone, black hole, adaptive difficulty |
-| 15 | Visual Polish | UI, effects, sound, bug fixing, final demo |
-
----
-
-## 🎬 How to Run
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/<your-username>/GravityLoop.git
-   cd GravityLoop
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   pip install pygame
-   ```
-
-3. Run the game:
-
-   ```bash
-   python main.py
-   ```
-
----
-
-## 👥 Team Roles
+## 👥 Tim Pengembang
 
 **Wayan Raditya Putra**
 
-* Core gameplay logic
-* Physics system (gravity, orbit, release)
-* AI system and obstacle behavior
-* Class architecture and system integration
+* Arsitektur sistem dan game engine
+* Mekanika gravitasi, orbit, dan release
+* Desain level dan balancing difficulty
+* Sistem obstacle dan hazard
 
 **Belva**
 
-* UI/UX design and implementation
-* Visual assets and animations
-* Scene transitions and interface programming
-* Integration testing and visual polish
+* UI/UX dan visual layout
+* Menu, transisi state, dan overlay
+* Integrasi aset visual dan polish tampilan
 
 ---
 
-## 📜 License (MIT)
+## 🧩 Konsep Gameplay
 
-```
-MIT License
+Pada Gravity Loop, pemain **tidak bisa bergerak bebas**:
 
-Copyright (c) 2025
+* tidak bisa berjalan
+* tidak bisa berhenti
+* tidak bisa mengarahkan arah gerak secara langsung
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the “Software”), to deal
-in the Software without restriction, including without limitation the rights  
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell  
-copies of the Software, and to permit persons to whom the Software is  
-furnished to do so, subject to the following conditions:
+Satu-satunya cara berpindah adalah:
 
-The above copyright notice and this permission notice shall be included in  
-all copies or substantial portions of the Software.
+1. Tertarik gravitasi planet terdekat
+2. Masuk ke orbit
+3. Melepaskan diri (**release**) pada waktu yang tepat
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,  
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE  
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER  
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN  
-THE SOFTWARE.
+Kesalahan timing akan menyebabkan pemain:
+
+* meleset ke luar layar
+* bertabrakan dengan meteor
+* tersedot black hole
+* gagal mencapai roket penyelamat
+
+Kontrol game dirancang **sengaja minimal** (satu input utama) agar fokus sepenuhnya pada **timing, pemahaman fisika, dan spatial awareness**.
+
+---
+
+## 🎮 Mekanika Inti
+
+* Planet dengan gaya gravitasi yang menangkap player ke orbit
+* Orbit bersifat otomatis dan terus berjalan tanpa input
+* Release dari orbit menentukan lintasan selanjutnya
+* Level bersifat **deterministik** (tanpa RNG gameplay kritikal)
+* Tidak ada fase “melayang kosong” tanpa pegangan planet
+
+---
+
+## 🧠 Filosofi Desain
+
+Gravity Loop menerapkan **constraint-based design**:
+
+* pemain selalu berada dalam batasan fisika
+* keputusan kecil berdampak besar
+* kesalahan bukan karena kontrol, tapi karena timing dan perencanaan
+
+Setiap level dirancang sebagai **puzzle fisika**, bukan sekadar rintangan reaktif.
+
+---
+
+## 🧱 Arsitektur Sistem (OOP)
+
+Struktur game dibangun secara modular:
+
+* `GameEngine`
+  Mengelola game loop, state, dan integrasi seluruh sistem
+
+* `LevelManager`
+  Mendefinisikan isi level (planet, meteor, black hole, spawn)
+
+* `Player`
+  Mengelola orbit, release, status hidup, dan collision
+
+* `Planet`
+  Menyediakan gaya gravitasi dan mekanisme orbit
+
+* `Meteor`
+  Obstacle statis dan dinamis
+
+* `MeteorSpawner`
+  Spawner terarah (non-random) berbasis emitter
+
+* `BlackHole`
+  Hazard gravitasi fatal sebagai choke point
+
+* UI States:
+
+  * Lobby
+  * Level Select
+  * Playing
+  * Game Over
+
+Pendekatan ini memisahkan dengan jelas:
+
+* logika gameplay
+* desain level
+* UI dan visual
+* state management
+
+---
+
+## 🧪 Desain Level
+
+### Level 1 – EASY
+
+Fokus: pengenalan mekanik
+
+* Planet sedikit dan berdekatan
+* Orbit stabil dan lambat
+* Tidak ada obstacle
+* Player otomatis masuk orbit awal tanpa input
+
+### Level 2 – PYRHA (MEDIUM)
+
+Fokus: timing dan pressure
+
+* Jarak planet lebih jauh
+* Orbit lebih cepat
+* Meteor statis sebagai zona bahaya
+* Meteor spawner terarah dari posisi tertentu
+* Memaksa pemain mengatur release dengan presisi
+
+### Level 3 – HARD
+
+Fokus: penguasaan total
+
+* 5 planet dengan jarak jauh
+* Orbit cepat dan tidak forgiving
+* 1 black hole besar sebagai choke point
+* Kombinasi meteor statis dan spawner
+* Tidak ada shortcut langsung ke roket
+* Menuntut perencanaan lintasan secara penuh
+
+---
+
+## 🎯 Tujuan Pembelajaran (Akademik)
+
+Melalui proyek ini, pengembang mempraktikkan:
+
+* Prinsip OOP:
+
+  * Encapsulation
+  * Inheritance
+  * Polymorphism
+* State-based game architecture
+* Simulasi fisika sederhana (gravitasi & orbit)
+* Desain level deterministik berbasis parameter
+* Kolaborasi tim menggunakan Git & GitHub
+
+---
+
+## 🛠️ Teknologi
+
+* **Bahasa:** Python 3
+* **Library:** Pygame
+* **Paradigma:** Object-Oriented Programming
+* **Tools:** Git, GitHub, VS Code
+
+---
+
+## ▶️ Cara Menjalankan
+
+```bash
+git clone https://github.com/<username>/GravityLoop.git
+cd GravityLoop
+pip install pygame
+python main.py
 ```
 
 ---
 
+
+## 📜 Lisensi
+
+MIT License © 2025
+
+---
