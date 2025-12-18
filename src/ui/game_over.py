@@ -6,11 +6,9 @@ class GameOverOverlay:
         self.screen = screen
         self.width, self.height = screen.get_size()
         
-        # Path assets
         self.img_path = os.path.join("src", "assets", "images", "gameover")
         
-        # --- 1. LOAD & SCALE ASSETS ---
-        # Tentukan ukuran tombol yang diinginkan (misal 80x80 pixel agar tidak menumpuk)
+        # LOAD ASSETS DAN SCALING SUPAYA GA GEDE, JADI 80 X 80
         btn_size = (80, 80) 
 
         # Load dan langsung kecilkan gambarnya
@@ -23,14 +21,13 @@ class GameOverOverlay:
         img_next = pygame.image.load(os.path.join(self.img_path, "nextlevel.png")).convert_alpha()
         self.btn_next = pygame.transform.smoothscale(img_next, btn_size)
 
-        # --- 2. LAYOUTING ---
-        # Ukuran Box Overlay
+        # LAYOUTING
         self.overlay_rect = pygame.Rect(0, 0, 500, 300)
-        self.overlay_rect.center = (self.width // 2, self.height // 2)
+        self.overlay_rect.center = (self.width // 2, self.height // 2) #ini box overlay
 
         # Posisi Tombol (Jarak antar centerx ditambah agar tidak rapat/menumpuk)
         y_pos = self.overlay_rect.centery + 50
-        spacing = 130 # Jarak horizontal antar tombol
+        spacing = 130
         
         self.rect_levels = self.btn_levels.get_rect(center=(self.overlay_rect.centerx - spacing, y_pos))
         self.rect_restart = self.btn_restart.get_rect(center=(self.overlay_rect.centerx, y_pos))

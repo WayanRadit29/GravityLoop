@@ -8,17 +8,16 @@ class AudioManager:
         # Click sound
         self.click = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxgame/pressclick.wav")
 
-        # Lose sounds
+        # Lose sound
         self.lose = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxlose/lose.wav")
-        # Win sounds
+        
+        # Win sound
         self.finallyrocket = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxwin/finallyrocket.wav")
         self.win = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxwin/win.wav")
 
         # Jump sound
         self.jump = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxgame/hopjump.wav")
         
-        
-
         self.has_played_lose = False
         self.has_played_win = False
         
@@ -41,7 +40,6 @@ class AudioManager:
 
     def play_lobby_music(self):
         """Memutar musik di menu lobby (mp3)"""
-        # Reset flag agar suara win/lose bisa bunyi lagi di level berikutnya
         self.has_played_lose = False
         self.has_played_win = False
         
@@ -49,7 +47,7 @@ class AudioManager:
         if os.path.exists(path):
             pygame.mixer.music.load(path)
             pygame.mixer.music.set_volume(0.5)
-            pygame.mixer.music.play(-1) # Loop selamanya
+            pygame.mixer.music.play(-1) # looping
         else:
             print(f"Warning: File {path} tidak ditemukan!")
 
@@ -61,8 +59,12 @@ class AudioManager:
             pygame.mixer.music.set_volume(0.4)
             pygame.mixer.music.play(-1)
         else:
-            print(f"Warning: File {path} tidak ditemukan!")
+            print(f"Warning: File {path} not found!")
 
     def stop_music(self):
-        """Berhentikan semua musik background"""
+        """Stop all music background"""
         pygame.mixer.music.stop()
+        
+    def reset_flags(self):
+        self.has_played_lose = False
+        self.has_played_win = False

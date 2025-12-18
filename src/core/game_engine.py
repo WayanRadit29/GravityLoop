@@ -45,10 +45,9 @@ class GameEngine:
         self.win = False
         self.current_level = 1
 
-        # --- TAMBAHAN: Jalankan musik lobby saat aplikasi dibuka ---
         self.audio.play_lobby_music()
 
-    # ================= LEVEL LOADING =================
+    # LOAD LEVEL
 
     def load_level(self, level_id):
         level_data = self.level_manager.load_level(level_id)
@@ -74,8 +73,12 @@ class GameEngine:
         self.game_over = False
         self.win = False
         
-        # --- TAMBAHAN: Ganti musik ke musik gameplay saat level di-load ---
+        self.audio.has_played_win = False
+        self.audio.has_played_lose = False
+
         self.audio.play_game_music()
+        self.audio.reset_flags()
+        
 
     def run(self):
         while self.running:
@@ -83,6 +86,7 @@ class GameEngine:
             self.handle_events()
             self.update()
             self.render()
+
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -107,18 +111,16 @@ class GameEngine:
                     self.start_game(3)
                 elif action == "GO_LOBBY":
                     self.state = "LOBBY"
-                    # --- TAMBAHAN: Balik ke musik lobby ---
                     self.audio.play_lobby_music()
 
             elif self.state == "PLAYING":
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        # --- TAMBAHAN: SFX saat lompat/lepas orbit ---
                         self.audio.play_jump() 
                         self.player.release_orbit()
                         
                     if self.win and event.key == pygame.K_RETURN:
-                        self.audio.play_click() # --- TAMBAHAN SFX KLIK ---
+                        self.audio.play_click()
                         self.next_level()
 
                 if self.game_over or self.win:
@@ -128,7 +130,6 @@ class GameEngine:
                         
                     if action == "PICK_LEVEL":
                         self.state = "LEVEL_SELECT"
-                        # --- TAMBAHAN: Balik ke musik lobby ---
                         self.audio.play_lobby_music()
                     elif action == "RESTART":
                         self.load_level(self.current_level)
@@ -199,7 +200,7 @@ class GameEngine:
             self.win = True
             self.audio.play_win()
 
-    # ================= RENDER =================
+    # RENDERING
     def render(self):
         self.screen.fill(COLOR_BACKGROUND)
 
@@ -248,5 +249,4 @@ class GameEngine:
             self.load_level(self.current_level)
         else:
             self.state = "LOBBY"
-            # --- TAMBAHAN: Balik ke musik lobby jika tamat ---
             self.audio.play_lobby_music()
