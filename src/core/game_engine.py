@@ -17,8 +17,6 @@ from src.ui.lobby import Lobby
 from src.ui.picklevel import PickLevel
 from src.ui.game_over import GameOverOverlay
 
-
-
 class GameEngine:
     def __init__(self):
         self.screen = pygame.display.set_mode(
@@ -59,7 +57,9 @@ class GameEngine:
         self.win = False
 
         self.current_level = 1
-        
+
+        # --- TAMBAHAN: Jalankan musik lobby saat aplikasi dibuka ---
+        self.audio.play_lobby_music()
 
     # ================= LEVEL LOADING =================
 
@@ -83,6 +83,9 @@ class GameEngine:
 
         self.game_over = False
         self.win = False
+        
+        # --- TAMBAHAN: Ganti musik ke musik gameplay saat level di-load ---
+        self.audio.play_game_music()
 
     # ================= MAIN LOOP =================
 
@@ -118,6 +121,8 @@ class GameEngine:
                     self.start_game(3)
                 elif action == "GO_LOBBY":
                     self.state = "LOBBY"
+                    # --- TAMBAHAN: Balik ke musik lobby ---
+                    self.audio.play_lobby_music()
 
             # ---------- PLAYING ----------
             elif self.state == "PLAYING":
@@ -132,6 +137,8 @@ class GameEngine:
                     action = self.game_over_ui.handle_event(event)
                     if action == "PICK_LEVEL":
                         self.state = "LEVEL_SELECT"
+                        # --- TAMBAHAN: Balik ke musik lobby ---
+                        self.audio.play_lobby_music()
                     elif action == "RESTART":
                         self.load_level(self.current_level)
                     elif action == "NEXT" and self.win:
@@ -142,16 +149,15 @@ class GameEngine:
                 action = self.game_over_ui.handle_event(event)
                 if action == "PICK_LEVEL":
                     self.state = "LEVEL_SELECT"
+                    # --- TAMBAHAN: Balik ke musik lobby ---
+                    self.audio.play_lobby_music()
                 elif action == "RESTART":
                     self.load_level(self.current_level)
-                    
                 elif action == "NEXT" and self.win:
                     self.next_level()
-                        
-            
 
     # ================= UPDATE =================
-
+    # (Logika update tetap sama seperti kodemu sebelumnya)
     def update(self):
         if self.state != "PLAYING":
             return
@@ -215,7 +221,6 @@ class GameEngine:
             self.audio.play_win()
 
     # ================= RENDER =================
-
     def render(self):
         self.screen.fill(COLOR_BACKGROUND)
 
@@ -267,3 +272,5 @@ class GameEngine:
             self.load_level(self.current_level)
         else:
             self.state = "LOBBY"
+            # --- TAMBAHAN: Balik ke musik lobby jika tamat ---
+            self.audio.play_lobby_music()

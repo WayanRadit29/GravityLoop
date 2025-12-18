@@ -1,5 +1,5 @@
 import pygame
-
+import os
 
 class AudioManager:
     def __init__(self):
@@ -31,3 +31,33 @@ class AudioManager:
             self.finallyrocket.play()
             self.win.play()
             self.has_played_win = True
+
+    # --- TAMBAHAN CODE UNTUK CONNECT KE GAME ENGINE ---
+
+    def play_lobby_music(self):
+        """Memutar musik di menu lobby (mp3)"""
+        # Reset flag agar suara win/lose bisa bunyi lagi di level berikutnya
+        self.has_played_lose = False
+        self.has_played_win = False
+        
+        path = os.path.join("src", "assets", "sounds", "bgm", "bgminlobby.mp3")
+        if os.path.exists(path):
+            pygame.mixer.music.load(path)
+            pygame.mixer.music.set_volume(0.5)
+            pygame.mixer.music.play(-1) # Loop selamanya
+        else:
+            print(f"Warning: File {path} tidak ditemukan!")
+
+    def play_game_music(self):
+        """Memutar musik saat masuk ke gameplay (wav)"""
+        path = os.path.join("src", "assets", "sounds", "bgm", "bgmingame.wav")
+        if os.path.exists(path):
+            pygame.mixer.music.load(path)
+            pygame.mixer.music.set_volume(0.4)
+            pygame.mixer.music.play(-1)
+        else:
+            print(f"Warning: File {path} tidak ditemukan!")
+
+    def stop_music(self):
+        """Berhentikan semua musik background"""
+        pygame.mixer.music.stop()
