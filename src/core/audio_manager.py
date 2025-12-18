@@ -39,7 +39,6 @@ class AudioManager:
         self.jump.play()
 
     def play_lobby_music(self):
-        """Memutar musik di menu lobby (mp3)"""
         self.has_played_lose = False
         self.has_played_win = False
         
@@ -52,7 +51,6 @@ class AudioManager:
             print(f"Warning: File {path} tidak ditemukan!")
 
     def play_game_music(self):
-        """Memutar musik saat masuk ke gameplay (wav)"""
         path = os.path.join("src", "assets", "sounds", "bgm", "bgmingame.wav")
         if os.path.exists(path):
             pygame.mixer.music.load(path)
@@ -60,10 +58,6 @@ class AudioManager:
             pygame.mixer.music.play(-1)
         else:
             print(f"Warning: File {path} not found!")
-
-    def stop_music(self):
-        """Stop all music background"""
-        pygame.mixer.music.stop()
         
     def reset_flags(self):
         self.has_played_lose = False
