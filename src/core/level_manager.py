@@ -86,23 +86,53 @@ class LevelManager:
 
     def _hard_level(self):
         planets = [
-            Planet(240, 280, 45),
-            Planet(380, 180, 42),
-            Planet(520, 260, 40),
-            Planet(640, 380, 40),
+            Planet(140, 480, 46),   # P1 - spawn (kiri bawah)
+            Planet(180, 140, 42),   # P2 - kiri atas
+            Planet(360, 260, 40),   # P3 - tengah kiri
+            Planet(520, 420, 38),   # P4 - kanan bawah
+            Planet(660, 160, 36),   # P5 - kanan atas (final gate)
         ]
 
+        blackhole = BlackHole(
+            480,   # x
+            300,   # y
+            99  # besar tapi tidak overlap
+        )
+
+        static_meteors = [
+            Meteor(260, 220),  # nutup shortcut P2 → P3
+            Meteor(430, 180),  # pressure dekat black hole
+            Meteor(580, 300),  # jebakan orbit P3 → P4
+            Meteor(520, 500),  # nutup jalur bawah kosong
+        ]
+
+        spawner = MeteorSpawner(mode="FROM_STATIC")
+        spawner.set_emitters([
+            {
+                "pos": (430, 180),
+                "direction": (0.10, 1.0),
+                "speed": 5.4,
+                "interval": 2400
+            },
+            {
+                "pos": (580, 300),
+                "direction": (-0.18, 0.95),
+                "speed": 5.8,
+                "interval": 3100
+            }
+        ])
+
         rocket = Rocket(
-            self.screen_width - 70,
-            self.screen_height // 2
+            740,
+            300
         )
 
         return {
             "planets": planets,
             "player_spawn_planet_index": 0,
-            "blackhole": BlackHole(450, 320, 110),
-            "static_meteors": [],
-            "meteor_spawner": None,
+            "blackhole": blackhole,
+            "static_meteors": static_meteors,
+            "meteor_spawner": spawner,
             "rocket": rocket,
             "name": "HARD"
         }
