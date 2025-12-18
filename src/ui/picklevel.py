@@ -9,11 +9,11 @@ class PickLevel:
         # Path assets
         self.img_path = os.path.join("src", "assets", "images")
         
-        # Load Background & Title
+        # load bg dan title
         self.bg = pygame.image.load(os.path.join(self.img_path, "lobby", "lobby_bg.png")).convert()
         self.title = pygame.image.load(os.path.join(self.img_path, "picklevel", "pickyourlevel.png")).convert_alpha()
         
-        # Load Buttons
+        # Load tombols
         self.btn_easy = pygame.image.load(os.path.join(self.img_path, "picklevel", "easy.png")).convert_alpha()
         self.btn_medium = pygame.image.load(os.path.join(self.img_path, "picklevel", "medium.png")).convert_alpha()
         self.btn_hard = pygame.image.load(os.path.join(self.img_path, "picklevel", "hard.png")).convert_alpha()
@@ -24,7 +24,7 @@ class PickLevel:
         self.meteor = pygame.image.load(os.path.join(self.img_path, "meteors", "idle.png")).convert_alpha()
         
 
-        # Posisi Tombol
+        # Posisi Tombols
         self.rect_easy = self.btn_easy.get_rect(center=(self.width // 2 - 270, 300))
         self.rect_medium = self.btn_medium.get_rect(center=(self.width // 2 - 5, 300))
         self.rect_hard = self.btn_hard.get_rect(center=(self.width // 2 + 265, 300))
@@ -32,8 +32,8 @@ class PickLevel:
 
     def draw(self):
         self.screen.blit(self.bg, (0, 0))
-        self.screen.blit(self.planet1, (-300, 200))   # Kiri bawah (Planet Bara)
-        self.screen.blit(self.planet4, (500, 72))  # Kanan atas (Planet Hijau)    # Pojok kanan bawah
+        self.screen.blit(self.planet1, (-300, 200))
+        self.screen.blit(self.planet4, (500, 72))
         self.screen.blit(self.meteor, (100, 60))  
         self.screen.blit(self.title, (self.width // 2 - self.title.get_width() // 2, -50))
         

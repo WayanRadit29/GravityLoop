@@ -10,16 +10,12 @@ class Planet:
         self.y = y
         self.radius = radius
 
-        # ===== GRAVITY TUNING =====
-        # Lebih kecil agar tidak overlap antar planet (khusus easy)
+        # Gravity Tuning (lebih kecil supaya ga overlap antar planet untuk yg Easy)
         self.gravity_radius = radius * 2
         self.gravity_strength = GRAVITY_CONSTANT * 2.2
 
-        # ===== VISUAL =====
-        self.sprite = load_sprite(
-            "src/assets/images/planets/planet_1.png",
-            scale=(self.radius * 2, self.radius * 2)
-        )
+        # Visual
+        self.sprite = load_sprite("src/assets/images/planets/planet_1.png",scale=(self.radius * 2, self.radius * 2))
 
     def apply_gravity(self, player):
         dx = self.x - player.x
@@ -29,7 +25,7 @@ class Planet:
         if dist == 0:
             return
 
-        # Auto-orbit jika masuk radius dan aman
+        # Auto orbit kalo masuk radius
         if (
             dist < self.gravity_radius
             and not player.is_orbiting
@@ -38,7 +34,7 @@ class Planet:
             player.start_orbit(self)
             return
 
-        # Tarikan gravitasi normal (sebelum orbit)
+        # gaya sedot / tarik gravitasi ke planet
         if dist < self.gravity_radius and not player.is_orbiting:
             nx = dx / dist
             ny = dy / dist

@@ -9,12 +9,9 @@ class Rocket:
         self.y = y
         self.radius = radius
 
-        # Placeholder visual (nanti ganti sprite roket)
+        # Placeholder visual (sprite roket)
         self.color = (220, 220, 220)
-        self.sprite = load_sprite(
-            "src/assets/images/rocket/rocket.png",
-            scale=(70, 80)
-        )
+        self.sprite = load_sprite("src/assets/images/rocket/rocket.png",scale=(70, 80))
 
 
     def check_dock(self, player) -> bool:

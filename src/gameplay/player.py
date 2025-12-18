@@ -43,51 +43,41 @@ class Player:
         self.radius = 10
         self.color = (200, 230, 255)
         self.visual_state = "IDLE"
-        self.sprites = {
-            "IDLE": load_sprite(
-                "src/assets/images/astronot/idle.png",
-                scale=(64, 64)
-            ),
-            "SWING": load_sprite(
-                "src/assets/images/astronot/swinging.png",
-                scale=(64, 64)
-            ),
-            "CRASH": load_sprite(
-                "src/assets/images/astronot/crash.png",
-                scale=(64, 64)
-            )
-        }
+        self.sprites = {"IDLE": load_sprite("src/assets/images/astronot/idle.png",scale=(64, 64)),
+                        "SWING": load_sprite("src/assets/images/astronot/swinging.png",scale=(64, 64)),
+                        "CRASH": load_sprite("src/assets/images/astronot/crash.png",scale=(64, 64))
+                          }
 
     def reset(self, x: float, y: float):
-        # Position
+        # position
         self.x = x
         self.y = y
 
-        # Velocity
+        # velocity
         self.vx = 1.5
         self.vy = 0.0
 
-        # Acceleration
+        # acceleration
         self.ax = 0.0
         self.ay = 0.0
 
-        # Orbit state
+        # orbit state
         self.is_orbiting = False
         self.orbit_center = None
         self.orbit_radius = 0.0
         self.orbit_angle = 0.0
 
-        # Black hole state
+        # black hole state
         self.in_blackhole = False
         self.bh_center = None
         self.bh_angle = 0.0
         self.bh_distance = 0.0
 
-        # Visual & life state
+        # visual & life state
         self.visual_state = "IDLE"
         self.alive = True
 
-        # Cooldowns
+        # cooldowns
         self.release_cooldown = 0
 
 
@@ -151,7 +141,7 @@ class Player:
             return  # crash state tidak berubah sendiri
 
         if self.in_blackhole:
-            return #Biarkan black hole yang atur
+            return #biarkan black hole yang atur
                 
         if self.is_orbiting:
             self.visual_state = "SWING"
@@ -172,7 +162,7 @@ class Player:
             if self.bh_distance < 25:
                 self.visual_state = "CRASH"
 
-            # Mati total
+            # Mati kalo udah di pusat blackhole
             if self.bh_distance < 5:
                 self.alive = False  
             return

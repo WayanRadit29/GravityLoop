@@ -15,7 +15,7 @@ class MeteorSpawner:
         self.speed_y = 4
         self.last_spawn_time = 0
 
-    # ================= CONFIG =================
+    # CONFIGURATION METHODS
 
     def set_random_config(self, spawn_interval=3000, speed_y=4):
         self.spawn_interval = spawn_interval
@@ -25,7 +25,7 @@ class MeteorSpawner:
         self.emitters = emitters
         self.last_spawn_times = [0 for _ in emitters]
 
-    # ================= UPDATE =================
+    # UPDATE METHOD
 
     def update(self, current_time, screen_height):
         if self.mode == "RANDOM":
@@ -42,7 +42,7 @@ class MeteorSpawner:
             if not m.is_off_screen(screen_height)
         ]
 
-    # ================= SPAWN MODES =================
+    # SPAWN UPDATE METHODS
 
     def _update_random(self, current_time):
         if current_time - self.last_spawn_time >= self.spawn_interval:
@@ -58,7 +58,7 @@ class MeteorSpawner:
                 self.spawn_from_emitter(emitter)
                 self.last_spawn_times[i] = current_time
 
-    # ================= SPAWN METHODS =================
+    # SPAWN METHODS
 
     def spawn_random(self):
         x = self.screen_width // 2
@@ -79,7 +79,7 @@ class MeteorSpawner:
         )
         self.meteors.append(meteor)
 
-    # ================= RENDER =================
+    # RENDER METHOD
 
     def render(self, surface):
         for meteor in self.meteors:
