@@ -5,29 +5,21 @@ from src.core.settings import (
 )
 
 from src.gameplay.player import Player
-from src.gameplay.planet import Planet
-from src.gameplay.rocket import Rocket
-from src.obstacle.meteor import Meteor
-from src.obstacle.meteor_spawner import MeteorSpawner
 from src.gameplay.collision import check_player_meteor_collision
-from src.obstacle.blackhole import BlackHole
 from src.core.audio_manager import AudioManager
 from src.core.level_manager import LevelManager
 from src.ui.lobby import Lobby
 from src.ui.picklevel import PickLevel
 from src.ui.game_over import GameOverOverlay
 
+
 class GameEngine:
     def __init__(self):
-        self.screen = pygame.display.set_mode(
-            (SCREEN_WIDTH, SCREEN_HEIGHT)
-        )
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption(WINDOW_TITLE)
 
-        # ===== STATE =====
         self.state = "LOBBY"
 
-        # ===== UI =====
         self.lobby = Lobby(self.screen)
         self.pick_level = PickLevel(self.screen)
         self.game_over_ui = GameOverOverlay(self.screen)
@@ -35,27 +27,22 @@ class GameEngine:
         self.clock = pygame.time.Clock()
         self.running = True
 
-        # ===== CORE SYSTEMS =====
         self.audio = AudioManager()
         self.level_manager = LevelManager(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-        # ===== PLAYER =====
         self.player = Player(
             x=SCREEN_WIDTH // 2,
             y=SCREEN_HEIGHT // 4
         )
 
-        # ===== WORLD OBJECTS =====
-        self.planet = None
+        self.planets = []
         self.blackhole = None
         self.rocket = None
         self.meteor_spawner = None
         self.static_meteors = []
 
-        # ===== GAME FLAGS =====
         self.game_over = False
         self.win = False
-
         self.current_level = 1
 
         # --- TAMBAHAN: Jalankan musik lobby saat aplikasi dibuka ---
@@ -72,22 +59,23 @@ class GameEngine:
         self.meteor_spawner = level_data.get("meteor_spawner")
         self.static_meteors = level_data.get("static_meteors", [])
 
-        if self.meteor_spawner is not None:
-            self.meteor_spawner.meteors.clear()
-            self.meteor_spawner.last_spawn_time = 0
+        spawn_index = level_data.get("player_spawn_planet_index", 0)
+        spawn_planet = self.planets[spawn_index]
 
         self.player.reset(
-            x=SCREEN_WIDTH // 2,
-            y=SCREEN_HEIGHT // 4
+            x=spawn_planet.x,
+            y=spawn_planet.y - spawn_planet.radius - 8
         )
+
+        if self.meteor_spawner:
+            self.meteor_spawner.meteors.clear()
+            self.meteor_spawner.last_spawn_time = 0
 
         self.game_over = False
         self.win = False
         
         # --- TAMBAHAN: Ganti musik ke musik gameplay saat level di-load ---
         self.audio.play_game_music()
-
-    # ================= MAIN LOOP =================
 
     def run(self):
         while self.running:
@@ -96,23 +84,18 @@ class GameEngine:
             self.update()
             self.render()
 
-    # ================= EVENTS =================
-
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
 
-            # ---------- LOBBY ----------
             if self.state == "LOBBY":
                 action = self.lobby.handle_event(event)
                 if action == "START":
                     self.state = "LEVEL_SELECT"
 
-            # ---------- PICK LEVEL ----------
             elif self.state == "LEVEL_SELECT":
                 action = self.pick_level.handle_event(event)
-
                 if action == "LEVEL_1":
                     self.start_game(1)
                 elif action == "LEVEL_2":
@@ -124,15 +107,13 @@ class GameEngine:
                     # --- TAMBAHAN: Balik ke musik lobby ---
                     self.audio.play_lobby_music()
 
-            # ---------- PLAYING ----------
             elif self.state == "PLAYING":
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         self.player.release_orbit()
-
                     if self.win and event.key == pygame.K_RETURN:
                         self.next_level()
-            
+
                 if self.game_over or self.win:
                     action = self.game_over_ui.handle_event(event)
                     if action == "PICK_LEVEL":
@@ -143,21 +124,6 @@ class GameEngine:
                         self.load_level(self.current_level)
                     elif action == "NEXT" and self.win:
                         self.next_level()
-                        
-            # ---------- GAME OVER ----------
-            elif self.state == "GAME_OVER":
-                action = self.game_over_ui.handle_event(event)
-                if action == "PICK_LEVEL":
-                    self.state = "LEVEL_SELECT"
-                    # --- TAMBAHAN: Balik ke musik lobby ---
-                    self.audio.play_lobby_music()
-                elif action == "RESTART":
-                    self.load_level(self.current_level)
-                elif action == "NEXT" and self.win:
-                    self.next_level()
-
-    # ================= UPDATE =================
-    # (Logika update tetap sama seperti kodemu sebelumnya)
     def update(self):
         if self.state != "PLAYING":
             return
@@ -234,7 +200,6 @@ class GameEngine:
             pygame.display.flip()
             return
 
-        # ===== PLAYING =====
         if self.blackhole:
             self.blackhole.render(self.screen)
 
@@ -251,15 +216,13 @@ class GameEngine:
 
         if self.rocket:
             self.rocket.render(self.screen)
-            
+
         if self.game_over:
             self.game_over_ui.draw("MISSION FAILED", (255, 0, 0))
         elif self.win:
-            self.game_over_ui.draw("ASTRONOUT RESCUED!", (0, 255, 0))
+            self.game_over_ui.draw("ASTRONAUT RESCUED!", (0, 255, 0))
 
         pygame.display.flip()
-
-    # ================= API =================
 
     def start_game(self, level_id):
         self.current_level = level_id

@@ -22,80 +22,79 @@ class LevelManager:
 
         return self.levels[level_id]()
 
-    # ===== LEVEL DEFINITIONS =====
+    # ================= LEVEL DEFINITIONS =================
 
     def _easy_level(self):
-        return {
-            # ===== PLANETS =====
-            # Planet 1 — Starter (auto-capture, safety net)
-            "planets": [
-                Planet(250, 300, 55),   # Planet 1
-                Planet(400, 200, 50),   # Planet 2
-                Planet(550, 350, 48),   # Planet 3
-            ],
+        planets = [
+            Planet(250, 300, 55),   # Planet 1 (starter, paling jauh dari roket)
+            Planet(400, 200, 50),   # Planet 2
+            Planet(550, 350, 48),   # Planet 3
+        ]
 
-            # ===== NO DANGERS =====
+        rocket = Rocket(
+            self.screen_width - 80,
+            self.screen_height // 2
+        )
+
+        return {
+            "planets": planets,
+            "player_spawn_planet_index": 0,  # SPAWN DI PLANET TERJAUH
             "blackhole": None,
             "static_meteors": [],
             "meteor_spawner": None,
-
-            # ===== GOAL =====
-            "rocket": Rocket(
-                self.screen_width - 80,  # ~720
-                self.screen_height // 2  # 300
-            ),
-
+            "rocket": rocket,
             "name": "EASY"
         }
 
-
     def _medium_level(self):
+        planets = [
+            Planet(260, 320, 50),
+            Planet(420, 220, 45),
+            Planet(580, 380, 45),
+        ]
+
+        rocket = Rocket(
+            self.screen_width - 90,
+            self.screen_height // 2
+        )
+
         return {
-            "planet": Planet(self.screen_width // 2, self.screen_height // 2, 45),
-
-            "blackhole": BlackHole(500, 300, 100),
-
-            "static_meteors": [
-                Meteor(300, 250),
-                Meteor(450, 200),
-            ],
-
+            "planets": planets,
+            "player_spawn_planet_index": 0,
+            "blackhole": BlackHole(460, 300, 90),
+            "static_meteors": [],
             "meteor_spawner": MeteorSpawner(
                 self.screen_width,
                 spawn_interval=3000,
                 speed_y=4
             ),
-
-            "rocket": Rocket(
-                self.screen_width - 100,
-                self.screen_height // 2
-            ),
-
+            "rocket": rocket,
             "name": "MEDIUM"
         }
 
     def _hard_level(self):
+        planets = [
+            Planet(240, 280, 45),
+            Planet(380, 180, 42),
+            Planet(520, 260, 40),
+            Planet(640, 380, 40),
+        ]
+
+        rocket = Rocket(
+            self.screen_width - 70,
+            self.screen_height // 2
+        )
+
         return {
-            "planet": Planet(self.screen_width // 2, self.screen_height // 2, 40),
-
-            "blackhole": BlackHole(420, 320, 120),
-
-            "static_meteors": [
-                Meteor(280, 220),
-                Meteor(500, 260),
-                Meteor(350, 400),
-            ],
-
+            "planets": planets,
+            "player_spawn_planet_index": 0,
+            "blackhole": BlackHole(450, 320, 110),
+            "static_meteors": [],
             "meteor_spawner": MeteorSpawner(
                 self.screen_width,
                 spawn_interval=2000,
                 speed_y=5
             ),
-
-            "rocket": Rocket(
-                self.screen_width - 80,
-                self.screen_height // 2
-            ),
-
+            "rocket": rocket,
             "name": "HARD"
         }
