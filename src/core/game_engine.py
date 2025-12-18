@@ -92,10 +92,13 @@ class GameEngine:
             if self.state == "LOBBY":
                 action = self.lobby.handle_event(event)
                 if action == "START":
+                    self.audio.play_click()
                     self.state = "LEVEL_SELECT"
 
             elif self.state == "LEVEL_SELECT":
                 action = self.pick_level.handle_event(event)
+                if action:
+                    self.audio.play_click()
                 if action == "LEVEL_1":
                     self.start_game(1)
                 elif action == "LEVEL_2":
@@ -113,11 +116,16 @@ class GameEngine:
                         # --- TAMBAHAN: SFX saat lompat/lepas orbit ---
                         self.audio.play_jump() 
                         self.player.release_orbit()
+                        
                     if self.win and event.key == pygame.K_RETURN:
+                        self.audio.play_click() # --- TAMBAHAN SFX KLIK ---
                         self.next_level()
 
                 if self.game_over or self.win:
                     action = self.game_over_ui.handle_event(event)
+                    if action:
+                        self.audio.play_click()
+                        
                     if action == "PICK_LEVEL":
                         self.state = "LEVEL_SELECT"
                         # --- TAMBAHAN: Balik ke musik lobby ---
@@ -126,6 +134,9 @@ class GameEngine:
                         self.load_level(self.current_level)
                     elif action == "NEXT" and self.win:
                         self.next_level()
+                        
+    
+                    
     def update(self):
         if self.state != "PLAYING":
             return

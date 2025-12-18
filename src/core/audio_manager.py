@@ -4,6 +4,9 @@ import os
 class AudioManager:
     def __init__(self):
         pygame.mixer.init()
+        
+        # Click sound
+        self.click = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxgame/pressclick.wav")
 
         # Lose sounds
         self.lose = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxlose/lose.wav")
@@ -13,9 +16,14 @@ class AudioManager:
 
         # Jump sound
         self.jump = pygame.mixer.Sound("src/assets/sounds/sound_effect/sfxgame/hopjump.wav")
+        
+        
 
         self.has_played_lose = False
         self.has_played_win = False
+        
+    def play_click(self):
+        self.click.play()
 
     def play_lose(self):
         if not self.has_played_lose:
